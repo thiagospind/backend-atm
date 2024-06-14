@@ -1,6 +1,5 @@
 package br.com.spindola.atm.model;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -41,7 +40,7 @@ public class BankAccount {
   
   @Column(name = "balance", nullable = false)
   @NotNull
-  private BigDecimal balance;
+  private Double balance;
   
   @Column(name = "client_id", nullable = false, insertable = false, updatable = false)
   @NotNull
@@ -58,7 +57,7 @@ public class BankAccount {
   public BankAccount() {
   }
 
-  public BankAccount(Long id, String account, String agency, BigDecimal balance) {
+  public BankAccount(Long id, String account, String agency, Double balance) {
     this.id = id;
     this.account = account;
     this.agency = agency;
@@ -90,11 +89,11 @@ public class BankAccount {
     this.agency = agency;
   }
 
-  public BigDecimal getBalance() {
+  public Double getBalance() {
     return this.balance;
   }
 
-  public void setBalance(BigDecimal balance) {
+  public void setBalance(Double balance) {
     this.balance = balance;
   }
 

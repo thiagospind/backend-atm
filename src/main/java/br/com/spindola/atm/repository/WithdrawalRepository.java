@@ -3,9 +3,9 @@ package br.com.spindola.atm.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import br.com.spindola.atm.model.BankAccount;
+import br.com.spindola.atm.model.Withdrawal;
 
 @Repository
-public interface BankAccountRepository extends JpaRepository<BankAccount, Long> {
+public interface WithdrawalRepository extends JpaRepository<Withdrawal, Long> {
   
 }

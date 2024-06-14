@@ -1,10 +1,10 @@
 package br.com.spindola.atm.model;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
 
 import org.hibernate.annotations.CreationTimestamp;
+
+// Remove the unused import statement
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -35,11 +35,39 @@ public class Withdrawal {
   
   @Column(name = "value", nullable = false)
   @NotNull
-  private BigDecimal value;
+  private Double value;
 
   @Column(name = "date", nullable = false, updatable = false)
   @CreationTimestamp
   private Date date;
+
+  @Column(columnDefinition = "jsonb")
+  private String notes;
+
+  public Long getBankAccountId() {
+    return this.bankAccountId;
+  }
+
+  public void setBankAccountId(Long bankAccountId) {
+    this.bankAccountId = bankAccountId;
+  }
+
+  public String getNotes() {
+    return this.notes;
+  }
+
+  public void setNotes(String notes) {
+    this.notes = notes;
+  }
+
+  public BankAccount getBankAccount() {
+    return this.bankAccount;
+  }
+
+  public void setBankAccount(BankAccount bankAccount) {
+    this.bankAccount = bankAccount;
+  }
+
   
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "bank_account_id")
@@ -48,11 +76,12 @@ public class Withdrawal {
   public Withdrawal() {
   }
 
-  public Withdrawal(Long id, Long accountId, BigDecimal value, Date date) {
+  public Withdrawal(Long id, Long accountId, Double value, Date date, String notes) {
     this.id = id;
     this.bankAccountId = accountId;
     this.value = value;
     this.date = date;
+    this.notes = notes;
   }
 
 
@@ -72,11 +101,11 @@ public class Withdrawal {
     this.bankAccountId = accountId;
   }
 
-  public BigDecimal getValue() {
+  public Double getValue() {
     return this.value;
   }
 
-  public void setValue(BigDecimal value) {
+  public void setValue(Double value) {
     this.value = value;
   }
 
@@ -107,7 +136,7 @@ public class Withdrawal {
       return false;
     }
     return Objects.equals(this.id, other.id) && Objects.equals(this.bankAccountId, other.bankAccountId) 
-      && Objects.equals(this.date, other.date) && Objects.equals(this.value, other.value);
+      && Objects.equals(this.date, other.date) && Objects.equals(this.value, other.value) && Objects.equals(this.notes, other.notes);
   }
 
   @Override
