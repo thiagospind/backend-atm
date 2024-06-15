@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import io.micrometer.common.lang.NonNull;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -22,6 +21,9 @@ import jakarta.validation.constraints.NotNull;
 @Entity
 @Table(name = BankAccount.TABLE_NAME)
 public class BankAccount {
+
+  public interface CreateBankAccount {}
+  public interface UpdateBankAccount {}
   
   public static final String TABLE_NAME = "bank_account";
   
@@ -31,24 +33,20 @@ public class BankAccount {
   private Long id;
   
   @Column(name = "account", length = 10, unique = true, nullable = false)
-  @NotEmpty
+  @NotEmpty(groups = {CreateBankAccount.class})
   private String account;
   
   @Column(name = "agency", length = 6, nullable = false)
-  @NotEmpty
+  @NotEmpty(groups = {CreateBankAccount.class})
   private String agency;
   
   @Column(name = "balance", nullable = false)
-  @NotNull
+  @NotNull(groups = {CreateBankAccount.class, UpdateBankAccount.class})
   private Double balance;
-  
-  @Column(name = "client_id", nullable = false, insertable = false, updatable = false)
-  @NotNull
-  private Long clientId;
 
-  
   @OneToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "client_id")
+  @JoinColumn(name = "client_id", nullable = false)
+  @NotNull(groups = {CreateBankAccount.class})
   private Client client;
 
   @OneToMany(mappedBy = "bankAccount", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -75,6 +73,34 @@ public class BankAccount {
 
   public String getAccount() {
     return this.account;
+  }
+
+  public void setClientId(Long clientId) {
+    if (clientId != null) {
+        Client client = new Client();
+        client.setId(clientId);
+        this.client = client;
+    }
+  }
+
+  public Long getClientId() {
+      return (this.client != null) ? this.client.getId() : null;
+  }
+
+  public Client getClient() {
+    return this.client;
+  }
+
+  public void setClient(Client client) {
+    this.client = client;
+  }
+
+  public List<Withdrawal> getWithdrawals() {
+    return this.withdrawals;
+  }
+
+  public void setWithdrawals(List<Withdrawal> withdrawals) {
+    this.withdrawals = withdrawals;
   }
 
   public void setAccount(String account) {
@@ -116,8 +142,8 @@ public class BankAccount {
       return false;
     }
     return Objects.equals(this.id, other.id) && Objects.equals(this.account, other.account) 
-      && Objects.equals(this.agency, other.agency) && Objects.equals(this.balance, other.balance)
-      && Objects.equals(this.clientId, other.clientId);
+      && Objects.equals(this.agency, other.agency) && Objects.equals(this.balance, other.balance);
+      // && Objects.equals(this.clientId, other.clientId);
   }
 
   @Override

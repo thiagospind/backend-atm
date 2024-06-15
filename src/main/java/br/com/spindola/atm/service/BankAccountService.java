@@ -18,8 +18,6 @@ public class BankAccountService {
   @Autowired
   private BankAccountRepository bankAccountRepository;
 
-  @Autowired
-  private WithdrawalRepository withdrawalRepository;
 
   public BankAccount findById(Long id) {
     Optional<BankAccount> bankAccount = this.bankAccountRepository.findById(id);

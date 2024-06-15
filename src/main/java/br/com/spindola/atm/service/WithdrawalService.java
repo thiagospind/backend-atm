@@ -1,6 +1,7 @@
 package br.com.spindola.atm.service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -29,46 +30,56 @@ public class WithdrawalService {
     ));
   }
 
-  // Implementar os metodos que vão buscar o saldo na conta, verificar se possui saldo 
-  // maior que o soliticado para saque, caso contrário vai informar o saldo.
-  // Caso o saldo seja maior ou igual o valor solicitado, efetuar o saque e salvar o valor sacado e atualizar o saldo do cliente.
+  public List<Withdrawal> findByBankAccountId(Long id) {
+    List<Withdrawal> withdraws = this.withdrawalRepository.findByBankAccountId(id);
+    if (withdraws.isEmpty()) {
+      throw new RuntimeException(
+          "Saques não encontrados para a conta bancária! Id: " + id + ", Tipo: " + Withdrawal.class.getName()
+      );
+    }
+    return withdraws;
+  }
 
   @Transactional
-  public Withdrawal withdraw(Long accountId, Double withdrawalAmount) {
+  public Withdrawal withdraw(Withdrawal obj) {
+    System.out.println("withdraw bank:"+obj.getBankAccountId());    
     
-    if (withdrawalAmount <= 0) {
+    if (obj.getValue() <= 0) {
       throw new RuntimeException("Valor de saque inválido. Deve ser um valor positivo.");
     }
 
-    if (withdrawalAmount <= 0 || withdrawalAmount % 10 != 0) {
+    if (obj.getValue() <= 0 || obj.getValue() % 10 != 0) {
       throw new RuntimeException("Valor de saque inválido. Deve ser um valor positivo e múltiplo de 10.");      
     }
     
-    Optional<BankAccount> bankAccountOptional = this.bankAccountRepository.findById(accountId);
+    BankAccount bankAccount = obj.getBankAccount();
+    // Optional<BankAccount> bankAccountOptional = this.bankAccountRepository.findById(accountId);
     
-    if (!bankAccountOptional.isPresent()) {
-      throw new RuntimeException("Conta bancária não encontrada para o id: " + accountId);
+    if (bankAccount == null) {
+      throw new RuntimeException("Conta bancária não encontrada para o id: " + obj.getBankAccountId());
     }
 
-    BankAccount bankAccount = bankAccountOptional.get();
+    // BankAccount bankAccount = bankAccountOptional.get();
     Double balance = bankAccount.getBalance();
+    bankAccount.getBalance();
 
-    if (balance.compareTo(withdrawalAmount) < 0) {
+    if (balance.compareTo(obj.getValue()) < 0) {
       throw new RuntimeException("Saldo insuficiente para o saque selecionado!");
     }
 
-    balance = balance - withdrawalAmount;
+    balance = balance - obj.getValue();
     bankAccount.setBalance(balance);
     bankAccountRepository.save(bankAccount);
     
     //Implementar metodo para salvar o saque e chama-lo aqui
 
-    Map<Integer, Double> notes = getWithdrawal(withdrawalAmount);
+    Map<Integer, Double> notes = getWithdrawal(obj.getValue());
 
     Withdrawal withdrawal = new Withdrawal();
-    withdrawal.setBankAccountId(accountId);
-    withdrawal.setValue(withdrawalAmount);
+    withdrawal.setBankAccountId(obj.getBankAccountId());
+    withdrawal.setValue(obj.getValue());
     withdrawal.setNotes(notes.toString());
+    System.out.println(notes.toString());
 
     Withdrawal withdraw = this.withdrawalRepository.save(withdrawal);
 

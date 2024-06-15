@@ -8,7 +8,6 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
@@ -17,6 +16,9 @@ import jakarta.validation.constraints.NotEmpty;
 @Table(name = Client.TABLE_NAME)
 public class Client {
 
+  public interface CreateClient {}
+  public interface UpdateClient {}
+
   public static final String TABLE_NAME = "client";
 
   @Id
@@ -24,12 +26,12 @@ public class Client {
   @Column(name = "id", unique = true, nullable = false)
   private Long id;
   
-  @Column(name = "name", length = 255, unique = true, nullable = false)
-  @NotEmpty
+  @Column(name = "name", length = 255, unique = false, nullable = false)
+  @NotEmpty(groups = {CreateClient.class, UpdateClient.class})
   private String name;
   
   @Column(name = "cpf", length = 11, unique = true, nullable = false)
-  @NotEmpty
+  @NotEmpty(groups = {CreateClient.class, UpdateClient.class})
   private String cpf;
   
   @OneToOne(mappedBy = "client", fetch = FetchType.LAZY)
