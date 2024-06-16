@@ -36,14 +36,13 @@ public class WithdrawalController {
   
   @GetMapping("/all/{id}")
   public ResponseEntity<List<Withdrawal>> findByBankAccountId(@PathVariable Long id) {
-    List<Withdrawal> withdrawals = this.withdrawalService.findByBankAccountId(id);
+    List<Withdrawal> withdrawals = this.withdrawalService.findAllByBankAccount(id);
     return ResponseEntity.ok().body(withdrawals);
   }
 
   @PostMapping
   @Validated(CreateWithdrawal.class)
   public ResponseEntity<Void> create(@Valid @RequestBody Withdrawal obj) {
-    System.out.println("withdraw bank controller: "+obj.getBankAccountId());
     if (obj.getBankAccountId() != null) {
       BankAccount bankAccount = new BankAccount();
       bankAccount.setId(obj.getBankAccountId());
